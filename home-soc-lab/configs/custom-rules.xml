@@ -1,0 +1,67 @@
+<!-- Custom Wazuh Rules -->
+<!-- Author: Muhammad Zoraiz Umar -->
+<!-- Purpose: Home SOC Lab — Enhanced Detection Rules -->
+
+<group name="custom_rules,">
+
+  <!-- Rule 1: Detect more than 5 failed logins in 2 minutes -->
+  <rule id="100001" level="12" frequency="5" timeframe="120">
+    <if_matched_sid>60122</if_matched_sid>
+    <description>Possible brute force attack — more than 
+    5 failed logins in 2 minutes</description>
+    <mitre>
+      <id>T1110.001</id>
+    </mitre>
+    <group>authentication_failed,brute_force</group>
+  </rule>
+
+  <!-- Rule 2: Detect login success after multiple failures -->
+  <rule id="100002" level="15">
+    <if_sid>60106</if_sid>
+    <if_matched_sid>60122</if_matched_sid>
+    <description>CRITICAL — Successful login after 
+    multiple failures. Possible brute force success.</description>
+    <mitre>
+      <id>T1110</id>
+    </mitre>
+    <group>authentication_success,brute_force_success</group>
+  </rule>
+
+  <!-- Rule 3: Detect Nmap port scanning -->
+  <rule id="100003" level="10">
+    <if_sid>40101</if_sid>
+    <description>Port scan detected from external host
+    </description>
+    <mitre>
+      <id>T1046</id>
+    </mitre>
+    <group>recon,port_scan</group>
+  </rule>
+
+  <!-- Rule 4: Detect administrator account lockout -->
+  <rule id="100004" level="14">
+    <if_sid>60204</if_sid>
+    <field name="win.eventdata.targetUserName">
+    administrator</field>
+    <description>CRITICAL — Administrator account 
+    locked out. Active brute force attack in progress.
+    </description>
+    <mitre>
+      <id>T1110.001</id>
+    </mitre>
+    <group>authentication_failed,account_lockout</group>
+  </rule>
+
+  <!-- Rule 5: Detect after-hours login (11pm to 5am) -->
+  <rule id="100005" level="12">
+    <if_sid>60106</if_sid>
+    <time>11 pm - 5 am</time>
+    <description>After-hours login detected — 
+    possible unauthorised access</description>
+    <mitre>
+      <id>T1078</id>
+    </mitre>
+    <group>authentication_success,after_hours</group>
+  </rule>
+
+</group>
